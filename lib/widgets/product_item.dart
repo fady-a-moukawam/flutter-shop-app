@@ -18,19 +18,26 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final product = Provider.of<Product>(context);
+    // if we use the Provider this will cause a full widget re-render on each update
+    // final product = Provider.of<Product>(context);
+
+//!for enhancement:
+//we can  set listen as false and wrap only the part of the widget that will be important tp update with a Consumer
+    final product = Provider.of<Product>(context, listen: false);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
         footer: GridTileBar(
           backgroundColor: Colors.black38,
-          leading: IconButton(
-            icon: Icon(product.isFavorite
-                ? Icons.favorite
-                : Icons.favorite_border_outlined),
-            color: Theme.of(context).colorScheme.secondary,
-            onPressed: product.toggleFavorite,
+          leading: Consumer<Product>(
+            builder: (_, value, child) => IconButton(
+              icon: Icon(product.isFavorite
+                  ? Icons.favorite
+                  : Icons.favorite_border_outlined),
+              color: Theme.of(context).colorScheme.secondary,
+              onPressed: product.toggleFavorite,
+            ),
           ),
           title: Text(
             product.title,
