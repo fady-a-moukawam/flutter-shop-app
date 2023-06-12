@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:shop_app/providers/cart.dart';
+import 'package:shop_app/screens/cart_screen.dart';
 
 import 'package:shop_app/widgets/product_grid_view.dart';
 
@@ -13,6 +17,10 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   bool _showOnlyFavorites = false;
+
+  void goToCart(ctx) {
+    Navigator.of(ctx).pushNamed(CartScreen.routeName);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +52,18 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
               ),
             ],
             icon: const Icon(Icons.more_vert),
+          ),
+          Consumer<Cart>(
+            child: IconButton(
+              onPressed: () => goToCart(context),
+              icon: const Icon(Icons.shopping_cart),
+              // color: Theme.of(context).colorScheme.primary,
+            ),
+            builder: (_, value, ch) => Badge(
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+              label: Text('${value.getItemCount}'),
+              child: ch,
+            ),
           )
         ],
       ),
