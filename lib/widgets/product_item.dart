@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:shop_app/providers/cart.dart';
 import 'package:shop_app/providers/product.dart';
 import 'package:shop_app/screens/product_detail_screen.dart';
 
@@ -24,6 +25,7 @@ class ProductItem extends StatelessWidget {
 //!for enhancement:
 //we can  set listen as false and wrap only the part of the widget that will be important tp update with a Consumer
     final product = Provider.of<Product>(context, listen: false);
+    final cartData = Provider.of<Cart>(context, listen: false);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -46,7 +48,10 @@ class ProductItem extends StatelessWidget {
           trailing: IconButton(
             icon: const Icon(Icons.shopping_cart),
             color: Theme.of(context).colorScheme.secondary,
-            onPressed: () => {},
+            onPressed: () => {
+              cartData.addProductToCart(
+                  product.id, product.title, product.price)
+            },
           ),
         ),
         child: GestureDetector(
