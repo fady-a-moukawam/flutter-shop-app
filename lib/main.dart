@@ -34,7 +34,6 @@ class MyApp extends StatelessWidget {
           title: 'My shop app',
           theme: ThemeData(
               fontFamily: 'Lato',
-              primarySwatch: Colors.blue,
               colorScheme: const ColorScheme(
                 brightness: Brightness.dark,
                 primary: Colors.orange,
