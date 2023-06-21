@@ -24,11 +24,45 @@ class _EditProductScreenState extends State<EditProductScreen> {
   var _editedProduct =
       Product(id: '', title: '', description: '', price: 0, imageUrl: '');
 
+  var _initValues = {
+    'title': '',
+    'description': '',
+    'price': '',
+    'imageUrl': ''
+  };
+
+  var _isInit = true;
+
   @override
   void initState() {
     super.initState();
     // adding a listener to focus event -> once the focus changed the _updateImageUrl will be executed
     _imageFocusNode.addListener(_updateImageUrl);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInit) {
+      final productId = ModalRoute.of(context)?.settings.arguments;
+
+      if (productId != null) {
+        _editedProduct = Provider.of<Products>(context, listen: false)
+            .findById(productId as String);
+      }
+
+      // ! important: we cannot assign initialValue while using a controller to the input
+      _initValues = {
+        'title': _editedProduct.title,
+        'description': _editedProduct.description,
+        'price': _editedProduct.price.toString(),
+        'imageUrl': ''
+      };
+
+      _imageUrlController.text = _editedProduct.imageUrl;
+    }
+
+    _isInit = false;
   }
 
   @override
@@ -54,9 +88,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (!isValid) {
       return;
     }
-
     _formKey.currentState?.save();
-    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+
+    //edit mode
+    if (_editedProduct.id.isNotEmpty) {
+      Provider.of<Products>(context, listen: false)
+          .updateProduct(_editedProduct);
+    } else {
+      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    }
+
     Navigator.of(context).pop();
   }
 
@@ -75,12 +116,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
             children: [
               TextFormField(
-                onSaved: (newValue) => _editedProduct = Product(
-                    id: _editedProduct.id,
-                    title: newValue!.isEmpty ? '' : newValue,
-                    description: _editedProduct.description,
-                    price: _editedProduct.price,
-                    imageUrl: _editedProduct.imageUrl),
+                initialValue: _initValues['title'],
+                onSaved: (newValue) {
+                  _editedProduct = Product(
+                      id: _editedProduct.id,
+                      title: newValue!.isEmpty ? '' : newValue,
+                      description: _editedProduct.description,
+                      price: _editedProduct.price,
+                      imageUrl: _editedProduct.imageUrl,
+                      isFavorite: _editedProduct.isFavorite);
+                },
+
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Enter a valid title';
@@ -96,16 +142,21 @@ class _EditProductScreenState extends State<EditProductScreen> {
               ),
               const SizedBox(height: 20),
               TextFormField(
+                initialValue: _initValues['price'],
                 focusNode: _priceFocusNode,
                 keyboardType: TextInputType.number,
-                onSaved: (newValue) => _editedProduct = Product(
-                    id: _editedProduct.id,
-                    title: _editedProduct.title,
-                    description: _editedProduct.description,
-                    price: (newValue!.isNotEmpty && double.parse(newValue) > 0)
-                        ? double.parse(newValue)
-                        : 0,
-                    imageUrl: _editedProduct.imageUrl),
+                onSaved: (newValue) {
+                  _editedProduct = Product(
+                      id: _editedProduct.id,
+                      title: _editedProduct.title,
+                      description: _editedProduct.description,
+                      price:
+                          (newValue!.isNotEmpty && double.parse(newValue) > 0)
+                              ? double.parse(newValue)
+                              : 0,
+                      imageUrl: _editedProduct.imageUrl,
+                      isFavorite: _editedProduct.isFavorite);
+                },
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Enter a valid price';
@@ -132,13 +183,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
               ),
               const SizedBox(height: 20),
               TextFormField(
+                initialValue: _initValues['description'],
                 focusNode: _descriptionFocusNode,
-                onSaved: (newValue) => _editedProduct = Product(
-                    id: _editedProduct.id,
-                    title: _editedProduct.title,
-                    description: newValue!.isNotEmpty ? newValue : '',
-                    price: _editedProduct.price,
-                    imageUrl: _editedProduct.imageUrl),
+                onSaved: (newValue) {
+                  _editedProduct = Product(
+                      id: _editedProduct.id,
+                      title: _editedProduct.title,
+                      description: newValue!.isNotEmpty ? newValue : '',
+                      price: _editedProduct.price,
+                      imageUrl: _editedProduct.imageUrl,
+                      isFavorite: _editedProduct.isFavorite);
+                },
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Enter a valid description';
@@ -177,13 +232,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     ),
                     Expanded(
                       child: TextFormField(
-                        onSaved: (newValue) => _editedProduct = Product(
-                          id: _editedProduct.id,
-                          title: _editedProduct.title,
-                          description: _editedProduct.description,
-                          price: _editedProduct.price,
-                          imageUrl: newValue!.isNotEmpty ? newValue : '',
-                        ),
+                        onSaved: (newValue) {
+                          _editedProduct = Product(
+                              id: _editedProduct.id,
+                              title: _editedProduct.title,
+                              description: _editedProduct.description,
+                              price: _editedProduct.price,
+                              imageUrl: newValue!.isNotEmpty
+                                  ? newValue
+                                  : _editedProduct.imageUrl,
+                              isFavorite: _editedProduct.isFavorite);
+                        },
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'Enter a valid image url';
