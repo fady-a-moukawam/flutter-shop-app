@@ -97,12 +97,20 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     //edit mode
     if (_editedProduct.id.isNotEmpty) {
-      Provider.of<Products>(context, listen: false)
-          .updateProduct(_editedProduct);
-      setState(() {
-        _isLoading = false;
-      });
-      Navigator.of(context).pop();
+      try {
+        await Provider.of<Products>(context, listen: false)
+            .updateProduct(_editedProduct);
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (!mounted) return;
+        Navigator.of(context).pop();
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Product update failed!')));
+      }
     }
     // add mode
     else {
