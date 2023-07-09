@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:shop_app/providers/product.dart';
+import 'package:shop_app/models/http_exception.dart';
 
 class Products with ChangeNotifier {
   List<Product> _items = [
@@ -111,18 +112,50 @@ class Products with ChangeNotifier {
     }
   }
 
-  void updateProduct(Product editedProduct) {
+  Future<void> updateProduct(Product editedProduct) async {
     final prodIndex =
         _items.indexWhere((element) => element.id == editedProduct.id);
 
     if (prodIndex > -1) {
-      _items[prodIndex] = editedProduct;
-      notifyListeners();
+      try {
+        final url = Uri.parse(
+            'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/products/${editedProduct.id}.json');
+        await http.patch(url,
+            body: json.encode({
+              'title': editedProduct.title,
+              'description': editedProduct.description,
+              'price': editedProduct.price,
+              'imageUrl': editedProduct.imageUrl,
+            }));
+
+        _items[prodIndex] = editedProduct;
+        notifyListeners();
+      } catch (error) {
+        print(error);
+      }
     }
   }
 
-  void deleteProduct(String productId) {
-    _items.removeWhere((element) => element.id == productId);
+  Future<void> deleteProduct(String productId) async {
+    final url = Uri.parse(
+        'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/products/$productId.json');
+
+    final productIndex =
+        _items.indexWhere((element) => element.id == productId);
+    Product? originalElementToBeDeleted = _items[productIndex];
+
+    _items.removeAt(productIndex);
     notifyListeners();
+    // delete method does not throw an error -> it will return the status code as 400 or greater
+    final res = await http.delete(url);
+
+    //in case of error
+    if (res.statusCode >= 400) {
+      _items.insert(productIndex, originalElementToBeDeleted);
+      notifyListeners();
+      throw HttpException('Could not delete product!');
+    }
+
+    originalElementToBeDeleted = null;
   }
 }
