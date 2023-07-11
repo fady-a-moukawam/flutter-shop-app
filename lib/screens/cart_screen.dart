@@ -35,20 +35,7 @@ class CartScreen extends StatelessWidget {
                         Text('\$ ${cartData.totalAmount.toStringAsFixed(2)}'),
                     backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
-                  Consumer<Orders>(
-                    builder: (_, value, child) => Column(
-                      children: [
-                        TextButton(
-                            onPressed: () {
-                              value.addOrder(cartData.getItems.values.toList(),
-                                  cartData.totalAmount);
-
-                              cartData.clearCart();
-                            },
-                            child: const Text('Order Now!')),
-                      ],
-                    ),
-                  )
+                  OrderButton(cartData: cartData),
                 ],
               ),
             ),
@@ -71,5 +58,52 @@ class CartScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    super.key,
+    required this.cartData,
+  });
+
+  final Cart cartData;
+
+  @override
+  State<OrderButton> createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const CircularProgressIndicator();
+    }
+
+    return TextButton(
+        onPressed: widget.cartData.totalAmount <= 0
+            ? null
+            : () async {
+                try {
+                  setState(() {
+                    _isLoading = true;
+                  });
+                  await Provider.of<Orders>(context, listen: false).addOrder(
+                      widget.cartData.getItems.values.toList(),
+                      widget.cartData.totalAmount);
+                  widget.cartData.clearCart();
+                  setState(() {
+                    _isLoading = false;
+                  });
+                } catch (error) {
+                  print(error);
+                  setState(() {
+                    _isLoading = false;
+                  });
+                }
+              },
+        child: const Text('Order Now!'));
   }
 }
