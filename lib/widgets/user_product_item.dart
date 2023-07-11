@@ -17,6 +17,7 @@ class UserProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scaffold = ScaffoldMessenger.of(context);
     final productsData = Provider.of<Products>(context, listen: false);
 
     return Card(
@@ -33,8 +34,15 @@ class UserProductItem extends StatelessWidget {
                 },
                 icon: const Icon(Icons.edit)),
             IconButton(
-                onPressed: () {
-                  productsData.deleteProduct(id);
+                onPressed: () async {
+                  try {
+                    await productsData.deleteProduct(id);
+                  } catch (error) {
+                    scaffold.showSnackBar(SnackBar(
+                      content: Text(error.toString()),
+                      backgroundColor: Colors.red,
+                    ));
+                  }
                 },
                 icon: const Icon(
                   Icons.delete,
