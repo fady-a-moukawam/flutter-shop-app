@@ -63,8 +63,14 @@ class Products with ChangeNotifier {
 
     try {
       final response = await http.get(url);
-      final apiProducts = json.decode(response.body) as Map<String, dynamic>;
+      final Map<String, dynamic>? apiProducts = json.decode(response.body);
       final List<Product> productList = [];
+
+      // make sure to validate if the response is not empty or else we will
+      // get an error while looping
+      if (apiProducts == null) {
+        return;
+      }
 
       apiProducts.forEach((key, value) {
         productList.add(Product(
