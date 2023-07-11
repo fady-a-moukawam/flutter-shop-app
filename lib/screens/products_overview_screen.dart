@@ -34,7 +34,17 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           .fetchAndSetProducts()
           .then((_) => setState(() {
                 _isLoadingProducts = false;
-              }));
+              }))
+          .catchError((err) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content:
+              Text('Failed to load', style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.red,
+        ));
+        setState(() {
+          _isLoadingProducts = false;
+        });
+      });
     }
 
     _isInit = false;
