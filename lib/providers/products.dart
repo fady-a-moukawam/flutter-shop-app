@@ -8,6 +8,7 @@ import 'package:shop_app/models/http_exception.dart';
 class Products with ChangeNotifier {
   // adding token section
   final String authToken;
+  final String userId;
 
   List<Product> _items = [
     // Product(
@@ -52,8 +53,8 @@ class Products with ChangeNotifier {
     return [..._items];
   }
 
-  Products(this.authToken,
-      this._items); // here we are passing the token through the constructor
+  Products(this.authToken, this._items,
+      this.userId); // here we are passing the token through the constructor
 
   List<Product> get favoritesItems {
     return _items.where((element) => element.isFavorite).toList();
@@ -78,6 +79,12 @@ class Products with ChangeNotifier {
         return;
       }
 
+      final prodFavUrl = Uri.parse(
+          'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/userFavorites/$userId.json?auth=$authToken');
+
+      final favProducts = await http.get(prodFavUrl);
+      final favoriteData = json.decode(favProducts.body);
+
       apiProducts.forEach((key, value) {
         productList.add(Product(
           id: key,
@@ -85,7 +92,7 @@ class Products with ChangeNotifier {
           description: value['description'],
           price: value['price'],
           imageUrl: value['imageUrl'],
-          isFavorite: value['isFavorite'],
+          isFavorite: favoriteData == null ? false : favoriteData[key] ?? false,
         ));
       });
 
@@ -107,7 +114,6 @@ class Products with ChangeNotifier {
             'description': product.description,
             'price': product.price,
             'imageUrl': product.imageUrl,
-            'isFavorite': product.isFavorite
           }));
 
       final newProduct = Product(
