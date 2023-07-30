@@ -71,7 +71,7 @@ class AuthScreen extends StatelessWidget {
                   ),
                   Flexible(
                     flex: deviceSize.width > 600 ? 2 : 1,
-                    child: AuthCard(),
+                    child: const AuthCard(),
                   ),
                 ],
               ),
@@ -190,7 +190,7 @@ class _AuthCardState extends State<AuthCard> {
             child: Column(
               children: <Widget>[
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'E-Mail'),
+                  decoration: const InputDecoration(labelText: 'E-Mail'),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value!.isEmpty || !value.contains('@')) {
@@ -203,7 +203,7 @@ class _AuthCardState extends State<AuthCard> {
                   },
                 ),
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Password'),
+                  decoration: const InputDecoration(labelText: 'Password'),
                   obscureText: true,
                   controller: _passwordController,
                   validator: (value) {
