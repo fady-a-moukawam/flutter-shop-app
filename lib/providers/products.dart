@@ -6,6 +6,9 @@ import 'package:shop_app/providers/product.dart';
 import 'package:shop_app/models/http_exception.dart';
 
 class Products with ChangeNotifier {
+  // adding token section
+  final String authToken;
+
   List<Product> _items = [
     // Product(
     //   id: 'p1',
@@ -49,6 +52,9 @@ class Products with ChangeNotifier {
     return [..._items];
   }
 
+  Products(this.authToken,
+      this._items); // here we are passing the token through the constructor
+
   List<Product> get favoritesItems {
     return _items.where((element) => element.isFavorite).toList();
   }
@@ -59,7 +65,7 @@ class Products with ChangeNotifier {
 
   Future<void> fetchAndSetProducts() async {
     final url = Uri.parse(
-        'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/products.json');
+        'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/products.json?auth=$authToken');
 
     try {
       final response = await http.get(url);
@@ -92,7 +98,7 @@ class Products with ChangeNotifier {
 
   Future<void> addProduct(Product product) async {
     final url = Uri.parse(
-        'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/products.json');
+        'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/products.json?auth=$authToken');
 
     try {
       final response = await http.post(url,
@@ -125,7 +131,7 @@ class Products with ChangeNotifier {
     if (prodIndex > -1) {
       try {
         final url = Uri.parse(
-            'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/products/${editedProduct.id}.json');
+            'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/products/${editedProduct.id}.json?auth=$authToken');
         await http.patch(url,
             body: json.encode({
               'title': editedProduct.title,
@@ -144,7 +150,7 @@ class Products with ChangeNotifier {
 
   Future<void> deleteProduct(String productId) async {
     final url = Uri.parse(
-        'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/products/$productId.json');
+        'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/products/$productId.json?auth=$authToken');
 
     final productIndex =
         _items.indexWhere((element) => element.id == productId);
