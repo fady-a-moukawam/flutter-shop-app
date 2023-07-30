@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shop_app/models/http_exception.dart';
@@ -21,6 +23,10 @@ class OrderItem {
 
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
+  final String authToken;
+
+  Orders(this.authToken,
+      this._orders); // here we are passing the token through the constructor
 
   List<OrderItem> get getOrders {
     return [..._orders];
@@ -28,7 +34,7 @@ class Orders with ChangeNotifier {
 
   Future<void> fetchAndSetOrders() async {
     final url = Uri.parse(
-        'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/orders.json');
+        'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/orders.json?auth=$authToken');
 
     try {
       final res = await http.get(url);
@@ -64,7 +70,7 @@ class Orders with ChangeNotifier {
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     final url = Uri.parse(
-        'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/orders.json');
+        'https://flutter-shop-app-1f18f-default-rtdb.firebaseio.com/orders.json?auth=$authToken');
 
     try {
       final timeStamp = DateTime.now();
