@@ -40,8 +40,8 @@ class ProductItem extends StatelessWidget {
                     ? Icons.favorite
                     : Icons.favorite_border_outlined),
                 color: Theme.of(context).colorScheme.secondary,
-                onPressed: () =>
-                    product.toggleFavorite(authData.getToken as String)),
+                onPressed: () => product.toggleFavorite(
+                    authData.getToken as String, authData.userId)),
           ),
           title: Text(
             product.title,
