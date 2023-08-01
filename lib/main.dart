@@ -64,7 +64,12 @@ class MyApp extends StatelessWidget {
                 )),
             home: authData.isAuthenticated
                 ? const ProductsOverviewScreen()
-                : AuthScreen(),
+                : FutureBuilder(
+                    future: authData.tryAutoLogin(),
+                    builder: (ctx, authSnapshots) =>
+                        authSnapshots.connectionState == ConnectionState.waiting
+                            ? const Center(child: CircularProgressIndicator())
+                            : AuthScreen()),
             routes: {
               ProductsOverviewScreen.routeName: (context) =>
                   const ProductsOverviewScreen(),
