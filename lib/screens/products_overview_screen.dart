@@ -11,6 +11,8 @@ import 'package:shop_app/widgets/product_grid_view.dart';
 enum FilterOptions { favorites, all }
 
 class ProductsOverviewScreen extends StatefulWidget {
+  static const routeName = '/product-overview';
+
   const ProductsOverviewScreen({super.key});
 
   @override
@@ -34,7 +36,17 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           .fetchAndSetProducts()
           .then((_) => setState(() {
                 _isLoadingProducts = false;
-              }));
+              }))
+          .catchError((err) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content:
+              Text('Failed to load', style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.red,
+        ));
+        setState(() {
+          _isLoadingProducts = false;
+        });
+      });
     }
 
     _isInit = false;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/providers/auth.dart';
 
 import 'package:shop_app/providers/cart.dart';
 import 'package:shop_app/providers/product.dart';
@@ -26,6 +27,7 @@ class ProductItem extends StatelessWidget {
 //we can  set listen as false and wrap only the part of the widget that will be important tp update with a Consumer
     final product = Provider.of<Product>(context, listen: false);
     final cartData = Provider.of<Cart>(context, listen: false);
+    final authData = Provider.of<Auth>(context, listen: false);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -34,12 +36,12 @@ class ProductItem extends StatelessWidget {
           backgroundColor: Colors.black38,
           leading: Consumer<Product>(
             builder: (_, value, child) => IconButton(
-              icon: Icon(product.isFavorite
-                  ? Icons.favorite
-                  : Icons.favorite_border_outlined),
-              color: Theme.of(context).colorScheme.secondary,
-              onPressed: product.toggleFavorite,
-            ),
+                icon: Icon(product.isFavorite
+                    ? Icons.favorite
+                    : Icons.favorite_border_outlined),
+                color: Theme.of(context).colorScheme.secondary,
+                onPressed: () => product.toggleFavorite(
+                    authData.getToken as String, authData.userId)),
           ),
           title: Text(
             product.title,
