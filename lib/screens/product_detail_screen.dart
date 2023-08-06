@@ -19,29 +19,35 @@ class ProductDetailScreen extends StatelessWidget {
         Provider.of<Products>(context, listen: false).findById(productId);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(productObject.title),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(
-              height: 300,
-              width: double.infinity,
-              child: Hero(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 300,
+            pinned:
+                true, //even if we scroll it will always be shown else it will dissapear and appear on scroll
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(productObject.title),
+              background: Hero(
                 tag: productId,
                 child: Image.network(
                   productObject.imageUrl,
                   fit: BoxFit.cover,
                 ),
-              ),
+              ), //this part will only be shown if it s expanded
             ),
+          ),
+          SliverList(
+              delegate: SliverChildListDelegate([
             const SizedBox(
               height: 10,
             ),
             Text(
               '\$${productObject.price}',
-              style: const TextStyle(color: Colors.grey, fontSize: 20),
+              style: const TextStyle(
+                color: Colors.grey,
+                fontSize: 20,
+              ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(
               height: 10,
@@ -54,9 +60,12 @@ class ProductDetailScreen extends StatelessWidget {
                 softWrap: true,
                 textAlign: TextAlign.center,
               ),
-            )
-          ],
-        ),
+            ),
+            const SizedBox(
+              height: 900,
+            ) // added for testing purpose to be able to scroll and check appbar behaviour
+          ]))
+        ],
       ),
     );
   }
