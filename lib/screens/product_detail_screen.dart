@@ -28,9 +28,12 @@ class ProductDetailScreen extends StatelessWidget {
             SizedBox(
               height: 300,
               width: double.infinity,
-              child: Image.network(
-                productObject.imageUrl,
-                fit: BoxFit.cover,
+              child: Hero(
+                tag: productId,
+                child: Image.network(
+                  productObject.imageUrl,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             const SizedBox(
